@@ -5,7 +5,7 @@ from rl_lib.utils.spaces import Discrete, Continuous
 
 def convert_gym_space(space):
     if isinstance(space, gym.spaces.Discrete):
-        return Discrete(n=space.n)
+        return Discrete(n=space.n, shape=tuple())
     elif isinstance(space, gym.spaces.Box):
         return Continuous(mins=space.low, maxs=space.high, shape=space.shape)
 

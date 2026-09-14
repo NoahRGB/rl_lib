@@ -4,12 +4,14 @@ import numpy as np
 from rl_lib.algs.alg import Step
 from rl_lib.envs.env import EnvDetails
 from rl_lib.utils.networks import ActorCriticNetwork
+from rl_lib.utils.buffers import OnPolicyBuffer
 from rl_lib.utils.heads import CategoricalHead
 
 class PPO:
 
-    def __init__(self, lr: float, net_architecture: dict):
+    def __init__(self, lr: float, tmax: int, net_architecture: dict):
         self.lr = lr
+        self.tmax = tmax
         self.net_architecture = net_architecture
 
     def setup(self, env: EnvDetails, device: torch.device) -> None:
@@ -17,6 +19,7 @@ class PPO:
         self.device = device
 
         self.network = ActorCriticNetwork(env, 0.001, self.net_architecture)
+        self.buffer = OnPolicyBuffer(self.tmax, self.env.num_envs, self.env.state_space.shape, self.env.action_space.shape)
         self.is_continuous = self.network.get_head_type() is not CategoricalHead
 
     def act(self, state) -> Step:
