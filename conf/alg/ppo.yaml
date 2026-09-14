@@ -10,8 +10,30 @@ epsilon: 0.2
 entropy_weight: 0.0
 cgn: 0.5
 value_weight: 0.5
+load_path:
 
 net_architecture:
+  # shared_enc:
+  #   type: "CNN"
+  #   layers:
+  #     - type: "CONV"
+  #       in: "IN"
+  #       out: 16
+  #       kernel: 8
+  #       stride: 4
+  #       activation: "RELU"
+  #     - type: "CONV"
+  #       in: 16
+  #       out: 32
+  #       kernel: 4
+  #       stride: 2
+  #       activation: "RELU"
+  #     - type: "FLATTEN"
+  #     - type: "LINEAR"
+  #       in: 2592
+  #       out: 256
+  #       activation: "RELU"
+
   # shared_enc:
   #   type: "MLP"
   #   layers:

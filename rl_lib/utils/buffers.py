@@ -25,8 +25,6 @@ class Batch:
             gae = 0.0
             tmax = self.rewards.shape[0]
             advantages = torch.zeros_like(self.rewards).to(device)
-            state_values = state_values.squeeze(-1) # (tmax, num_envs)
-            final_state_values = final_state_values.squeeze(-1)  # (num_envs,)
             next_value = final_state_values
             for t in reversed(range(tmax)):
                 delta = self.rewards[t] + gamma * next_value * self.masks[t] - state_values[t]

@@ -17,6 +17,10 @@ def build_network(architecture: list, input_shape: tuple = None, output_shape: t
 
     for layer in architecture:
 
+        if layer["type"] == "FLATTEN":
+            layers.append(torch.nn.Flatten())
+            continue
+
         layer_in = layer["in"]
         layer_out = layer["out"]
 
@@ -31,6 +35,9 @@ def build_network(architecture: list, input_shape: tuple = None, output_shape: t
         
         if layer["type"] == "LINEAR":
             layers.append(torch.nn.Linear(layer_in, layer_out))
+        elif layer["type"] == "CONV":
+            kernel_size, stride = layer["kernel"], layer["stride"]
+            layers.append(torch.nn.Conv2d(layer_in, layer_out, kernel_size, stride))
 
         if activation:
             layers.append(activation)

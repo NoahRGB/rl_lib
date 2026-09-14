@@ -8,7 +8,9 @@ def detect_encoder(enc: dict, input_shape: tuple = None, output_shape: tuple = N
                       input_shape=input_shape, 
                       output_shape=output_shape)
     elif enc["type"] == "CNN":
-        return None
+        return CNNEnc(architecture=enc["layers"],
+                      input_shape=input_shape,
+                      output_shape=output_shape)
     else:
         print(f"Encoder type {enc['type']} not supported")
         return None
@@ -26,7 +28,14 @@ class MLPEnc(torch.nn.Module):
         return self.body(inp)
 
 
-class CNNEnc:
+class CNNEnc(torch.nn.Module):
 
-    def __init__(self):
-        ...
+    def __init__(self, architecture: list, input_shape: tuple = None, output_shape: tuple = None):
+        super(CNNEnc, self).__init__()
+
+        self.body, self.encoder_output = build_network(architecture=architecture,
+                                                       input_shape=input_shape,
+                                                       output_shape=output_shape)
+
+    def forward(self, inp):
+        return self.body(inp)

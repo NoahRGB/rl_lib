@@ -15,7 +15,8 @@ logger:
   files_log_dir: ${hydra:runtime.output_dir}
   tensorboard_log_dir: ./results/tensorboard
   use_tensorboard: True
-  use_files: True
+  use_files: False
+  save_network: False
   print_progress: True
 
 

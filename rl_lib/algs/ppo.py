@@ -11,7 +11,8 @@ class PPO:
 
     def __init__(self, lr: float, tmax: int, gamma: float, lam: float, 
                  epochs: int, minibatch_size: int, epsilon: float, cgn: float,
-                 entropy_weight: float, value_weight: float, net_architecture: dict):
+                 entropy_weight: float, value_weight: float, net_architecture: dict,
+                 load_path: str = None):
         self.lr = lr
         self.tmax = tmax
         self.gamma = gamma
@@ -23,6 +24,7 @@ class PPO:
         self.entropy_weight = entropy_weight
         self.value_weight = value_weight
         self.net_architecture = net_architecture
+        self.load_path = load_path
 
     def setup(self, env: EnvDetails, device: torch.device) -> None:
         self.env = env
@@ -34,12 +36,20 @@ class PPO:
         self.buffer = OnPolicyBuffer(self.tmax, self.env.num_envs, self.env.state_space.shape, self.env.action_space.shape)
         self.is_continuous = self.network.get_head_type() is not CategoricalHead
 
+        if self.load_path is not None:
+            checkpoint = torch.load(self.load_path, map_location=device)
+            self.network.load_state_dict(checkpoint["net"])
+            self.optim.load_state_dict(checkpoint["optim"])
+
     def learn(self):
         full_batch = self.buffer.get(self.device)
 
         with torch.no_grad():
-            _, state_values = self.network(full_batch.states) # (tmax, num_envs, 1)
-            _, final_state_values = self.network(full_batch.next_states[-1]) # (tmax, num_envs, 1)
+            _, state_values = self.network(full_batch.states.view(-1, *self.env.state_space.shape)) # (tmax, num_envs, 1)
+            _, final_state_values = self.network(full_batch.next_states[-1].view(-1, *self.env.state_space.shape)) # (tmax, num_envs, 1)
+
+            state_values = state_values.view(self.tmax, self.env.num_envs)
+            final_state_values = final_state_values.view(self.env.num_envs) # (num_envs,)
 
             advantages, returns = full_batch.gae(state_values, final_state_values, self.gamma, self.lam, self.device)
             flat_batch = full_batch.flatten()
@@ -83,11 +93,14 @@ class PPO:
                 self.optim.step()
 
                 self.stats = {
-                    "policy_loss": policy_loss.item(),
-                    "value_loss": state_value_loss.item(),
-                    "entropy_bonus": entropy_bonus.item(),
-                    "mean_advantage": minibatch_advantages.mean().item(),
-                    "mean_return": flat_returns[minibatch_indices].mean().item()
+                    "network": {"net": self.network.state_dict(), "optim": self.optim.state_dict()},
+                    "metrics": {
+                        "policy_loss": policy_loss.item(),
+                        "value_loss": state_value_loss.item(),
+                        "entropy_bonus": entropy_bonus.item(),
+                        "mean_advantage": minibatch_advantages.mean().item(),
+                        "mean_return": flat_returns[minibatch_indices].mean().item()
+                    }
                 }
 
     def act(self, state) -> Step:
@@ -104,7 +117,7 @@ class PPO:
                 distribution = torch.distributions.Categorical(logits=logits)
                 action = distribution.sample()
                 log_prob = distribution.log_prob(action)
-                
+
             return Step(action=action.cpu().numpy(), log_prob=log_prob.cpu().numpy())
 
     def timestep_complete(self, state, step: Step, reward, next_state, done) -> None:

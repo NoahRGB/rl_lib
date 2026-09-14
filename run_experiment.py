@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 import hydra
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, MISSING
@@ -12,6 +12,8 @@ class EnvConf:
     _target_: str = MISSING
     env_id: str = MISSING
     num_envs: int = MISSING
+    is_atari: Optional[bool] = False
+    normalise_obs: Optional[bool] = False
 
 @dataclass
 class LoggerConf:
@@ -20,6 +22,7 @@ class LoggerConf:
     tensorboard_log_dir: str = MISSING
     use_tensorboard: bool = MISSING
     use_files: bool = MISSING
+    save_network: bool = MISSING
     print_progress: bool = MISSING
 
 @dataclass

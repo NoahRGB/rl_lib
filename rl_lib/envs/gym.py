@@ -1,4 +1,5 @@
 import gymnasium as gym
+import ale_py
 
 from rl_lib.envs.env import EnvDetails
 from rl_lib.utils.spaces import Discrete, Continuous
@@ -11,9 +12,16 @@ def convert_gym_space(space):
 
 class GymEnv:
     
-    def __init__(self, env_id: str, num_envs: int, seed: int = None) -> None:
-        self.env = self._make_env(env_id, num_envs)
+    def __init__(self, env_id: str, num_envs: int, is_atari: bool = False, 
+                 normalise_obs: bool = False, seed: int = None) -> None:
+        
         self.seed = seed
+        self.is_atari = is_atari
+        self.normalise_obs = normalise_obs
+        self.env = self._make_env(env_id, num_envs)
+        if self.env is None:
+            raise ValueError(f"Environment {env_id} could not be created")
+
         self.details = EnvDetails(num_envs=num_envs, 
                                   action_space=convert_gym_space(self.env.single_action_space), 
                                   state_space=convert_gym_space(self.env.single_observation_space))
@@ -23,6 +31,18 @@ class GymEnv:
 
         def make_one_env():
             env = gym.make(env_name, **env_kwargs)
+
+            if self.is_atari:
+                env = gym.make(env_name, frameskip=1, **env_kwargs)
+                env = gym.wrappers.AtariPreprocessing(env,
+                    noop_max=30, frame_skip=4, terminal_on_life_loss=False,
+                    screen_size=84, grayscale_obs=True, grayscale_newaxis=False
+                )
+                env = gym.wrappers.FrameStackObservation(env, stack_size=4)
+
+            if self.normalise_obs:
+                env = gym.wrappers.NormalizeObservation(env)
+                
             return env
         
         try:
