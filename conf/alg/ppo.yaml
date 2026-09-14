@@ -1,0 +1,16 @@
+
+_target_: "rl_lib.algs.ppo.PPO"
+lr: 0.001
+net_architecture:
+  shared_enc:
+    type: "MLP"
+    layers:
+      - type: "LINEAR"
+        in: "IN"
+        out: 64
+        activation: "TANH"
+      - type: "LINEAR"
+        in: 64
+        out: 64
+        activation: "TANH"
+    

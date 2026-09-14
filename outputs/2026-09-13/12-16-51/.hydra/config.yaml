@@ -1,0 +1,10 @@
+env:
+  _target_: rl_lib.envs.gym.GymEnv
+  env_id: teast
+  num_envs: 1
+alg:
+  _target_: rl_lib.algs.ppo.PPO
+  lr: 0.001
+timesteps: 10000
+device: cuda
+seed: 1

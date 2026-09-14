@@ -1,0 +1,28 @@
+env:
+  _target_: rl_lib.envs.gym.GymEnv
+  env_id: CartPole-v1
+  num_envs: 1
+logger:
+  _target_: rl_lib.experiment.logger.Logger
+  log_dir: ./logs
+  use_tensorboard: true
+  use_files: true
+  print_progress: true
+alg:
+  _target_: rl_lib.algs.ppo.PPO
+  lr: 0.001
+  net_architecture:
+    shared_enc:
+      type: MLP
+      layers:
+      - type: LINEAR
+        in: IN
+        out: 64
+        activation: TANH
+      - type: LINEAR
+        in: 64
+        out: 64
+        activation: TANH
+timesteps: 10000
+device: cpu
+seed: 1

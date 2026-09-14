@@ -1,0 +1,4 @@
+env: {}
+alg:
+  _target_: rl_lib.algs.ppo.PPO
+  lr: 0.001

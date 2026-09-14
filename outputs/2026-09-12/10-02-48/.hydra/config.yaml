@@ -1,0 +1,11 @@
+env:
+  _target_: rl_lib.envs.gym.GymEnv
+  env_id: CartPole-v1
+  num_envs: 8
+  max_episode_steps: null
+alg:
+  _target_: rl_lib.algs.ppo.PPO
+  lr: 0.001
+timesteps: 10000
+device: cuda
+seed: 1

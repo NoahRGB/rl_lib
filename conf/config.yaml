@@ -1,0 +1,17 @@
+
+defaults:
+  - experiment_conf
+  - env: gym
+  - alg: ppo
+  - _self_
+timesteps: 10000
+device: cpu
+seed: 1
+
+logger:
+  _target_: rl_lib.experiment.logger.Logger
+  log_dir: ./logs
+  use_tensorboard: True
+  use_files: True
+  print_progress: True
+
