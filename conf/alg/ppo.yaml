@@ -1,10 +1,29 @@
 
 _target_: "rl_lib.algs.ppo.PPO"
 lr: 0.001
-tmax: 64
+tmax: 32
+gamma: 0.99
+lam: 0.8
+epochs: 20
+minibatch_size: 256
+epsilon: 0.2
+entropy_weight: 0.0
+cgn: 0.5
+value_weight: 0.5
 
 net_architecture:
-  shared_enc:
+  # shared_enc:
+  #   type: "MLP"
+  #   layers:
+  #     - type: "LINEAR"
+  #       in: "IN"
+  #       out: 64
+  #       activation: "TANH"
+  #     - type: "LINEAR"
+  #       in: 64
+  #       out: 64
+  #       activation: "TANH"
+  actor_enc:
     type: "MLP"
     layers:
       - type: "LINEAR"
@@ -15,4 +34,14 @@ net_architecture:
         in: 64
         out: 64
         activation: "TANH"
-    
+  value_enc:
+    type: "MLP"
+    layers:
+      - type: "LINEAR"
+        in: "IN"
+        out: 64
+        activation: "TANH"
+      - type: "LINEAR"
+        in: 64
+        out: 64
+        activation: "TANH"

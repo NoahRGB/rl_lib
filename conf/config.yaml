@@ -3,15 +3,25 @@ defaults:
   - experiment_conf
   - env: gym
   - alg: ppo
+  - override hydra/job_logging: disabled
   - _self_
-timesteps: 10000
+timesteps: 100000
 device: cpu
 seed: 1
+title: ppo_cartpole
 
 logger:
   _target_: rl_lib.experiment.logger.Logger
-  log_dir: ./logs
+  files_log_dir: ${hydra:runtime.output_dir}
+  tensorboard_log_dir: ./results/tensorboard
   use_tensorboard: True
   use_files: True
   print_progress: True
 
+
+hydra:
+  run:
+    dir: results/logs/${now:%Y-%m-%d}/${title}_${now:%H%M%S}
+  sweep:
+    dir: results/logs/${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${hydra.job.num}_${title}

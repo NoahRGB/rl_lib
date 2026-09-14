@@ -32,7 +32,7 @@ def run_experiment(agent: Algorithm, env: Environment, logger: Logger, timesteps
         dones = is_terms|is_truncs
 
         logger.timestep_complete(rewards, dones, agent.get_stats())
-        agent.timestep_complete(states, step, next_states, rewards, dones)
+        agent.timestep_complete(states, step, rewards, next_states, dones)
         states = next_states
 
         timesteps_completed += num_envs

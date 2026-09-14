@@ -1,4 +1,4 @@
 
 _target_: rl_lib.envs.gym.GymEnv
 env_id: "CartPole-v1"
-num_envs: 1
+num_envs: 8

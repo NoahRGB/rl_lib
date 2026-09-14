@@ -1,4 +1,0 @@
-env: {}
-alg:
-  _target_: algs.ppo.PPO
-  lr: 0.001

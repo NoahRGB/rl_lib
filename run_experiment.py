@@ -16,7 +16,8 @@ class EnvConf:
 @dataclass
 class LoggerConf:
     _target_: str = MISSING
-    log_dir: str = MISSING
+    files_log_dir: str = MISSING
+    tensorboard_log_dir: str = MISSING
     use_tensorboard: bool = MISSING
     use_files: bool = MISSING
     print_progress: bool = MISSING
@@ -26,6 +27,7 @@ class ExperimentConf:
     env: EnvConf = field(default_factory=EnvConf)
     logger: LoggerConf = field(default_factory=LoggerConf)
     alg: Any = MISSING
+    title: str = MISSING
     timesteps: int = MISSING
     device: str = MISSING
     seed: int = MISSING
@@ -42,7 +44,8 @@ def main(cfg: DictConfig) -> None:
     env = hydra.utils.instantiate(cfg.env, _partial_=True)
     env = env(seed=cfg.seed)
 
-    logger = hydra.utils.instantiate(cfg.logger)
+    logger = hydra.utils.instantiate(cfg.logger, _partial_=True)
+    logger = logger(title=cfg.title)
 
     run_experiment(agent, env, logger, cfg.timesteps, cfg.seed, device)
 
