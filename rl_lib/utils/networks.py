@@ -7,14 +7,13 @@ from rl_lib.utils.spaces import Discrete
 
 class QNetwork(torch.nn.Module):
 
-    def __init__(self, env: EnvDetails, architecture: dict):
+    def __init__(self, env: EnvDetails, architecture: dict, input_shape=None, output_shape=None):
         super(QNetwork, self).__init__()
-        assert type(env.action_space) == Discrete
 
-        self.encoder = detect_encoder(architecture["enc"], input_shape=env.state_space.shape)
+        self.encoder = detect_encoder(architecture["qnet_enc"], input_shape=env.state_space.shape if input_shape is None else input_shape)
         self.enc_out = self.encoder.encoder_output
 
-        self.qvals_out = torch.nn.Linear(self.enc_out, env.action_space.n)
+        self.qvals_out = torch.nn.Linear(self.enc_out, env.action_space.n if isinstance(env.action_space, Discrete) else env.action_space.shape[0])
 
     def forward(self, inp):
         enc_out = self.encoder(inp)
@@ -57,4 +56,30 @@ class ActorCriticNetwork(torch.nn.Module):
             value_output = self.value_head(enc_output)
         
         return actor_output, value_output
+
+class ActorNetwork(torch.nn.Module):
+
+    def __init__(self, env: EnvDetails, architecture: dict, is_deterministic: bool = False):
+        super(ActorNetwork, self).__init__()
+        self.is_deterministic = is_deterministic
+
+        self.enc = detect_encoder(architecture["actor_enc"], input_shape=env.state_space.shape)
+        self.enc_output = self.enc.encoder_output
+
+        if not self.is_deterministic:
+            self.actor_head = detect_head(action_space=env.action_space, input_size=self.enc_output)
+
+    def get_head_type(self):
+        if not self.is_deterministic:
+            return type(self.actor_head)
+        return None
+
+    def forward(self, inp):
+        enc_output = self.enc(inp)
+
+        if self.is_deterministic:
+            return enc_output
+        
+        actor_output = self.actor_head(enc_output)
+        return actor_output
         

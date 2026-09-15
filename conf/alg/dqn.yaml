@@ -19,7 +19,7 @@ epsilon_scheduler:
     steps: 8000
 
 net_architecture:
-  enc:
+  qnet_enc:
     type: "MLP"
     layers:
       - type: "LINEAR"

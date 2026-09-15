@@ -108,4 +108,4 @@ class DQN:
         
 
     def get_stats(self) -> dict:
-        return {}
+        return self.stats

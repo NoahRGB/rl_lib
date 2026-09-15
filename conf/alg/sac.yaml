@@ -1,0 +1,41 @@
+
+_target_: "rl_lib.algs.sac.SAC"
+lr: 0.0023
+replay_size: 100000
+target_update_interval: 10
+update_freq: 256
+gradient_steps: 128
+minibatch_size: 64
+gamma: 0.99
+alpha_start: 0.001
+auto_alpha: True
+target_factor: 0.005
+noise_factor: 0.01
+warmup_steps: 1000
+cgn: 10.0
+load_path:
+
+net_architecture:
+  actor_enc:
+    type: "MLP"
+    layers:
+      - type: "LINEAR"
+        in: "IN"
+        out: 256
+        activation: "RELU"
+      - type: "LINEAR"
+        in: 256
+        out: 256
+        activation: "RELU"
+
+  qnet_enc:
+    type: "MLP"
+    layers:
+      - type: "LINEAR"
+        in: "IN"
+        out: 256
+        activation: "RELU"
+      - type: "LINEAR"
+        in: 256
+        out: 256
+        activation: "RELU"
