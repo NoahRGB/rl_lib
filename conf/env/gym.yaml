@@ -1,6 +1,6 @@
 
 _target_: rl_lib.envs.gym.GymEnv
-env_id: "CartPole-v1"
+env_id: "CartPole-v1" # "PongNoFrameskip-v4"
 num_envs: 1
 is_atari: False
-normalise_obs: False
+normalise_obs: True

@@ -50,12 +50,12 @@ class DQN:
     
         if batch_size == self.minibatch_size:
 
-            qvals = self.network(full_batch.states)
-            chosen_qvals = qvals.gather(-1, full_batch.actions.long().unsqueeze(-1)).squeeze(-1)
+            qvals = self.network(full_batch.states.view(batch_size, *self.env.state_space.shape))
+            chosen_qvals = qvals.gather(-1, full_batch.actions.view(batch_size).long().unsqueeze(-1)).squeeze(-1)
             chosen_qvals = chosen_qvals.view(self.minibatch_size)
 
             with torch.no_grad():
-                next_qvals = self.target_network(full_batch.next_states)
+                next_qvals = self.target_network(full_batch.next_states.view(batch_size, *self.env.state_space.shape))
                 targets = full_batch.nstep_returns(next_qvals.max(-1)[0], self.gamma, self.device)
                 targets = targets.view(self.minibatch_size)
 

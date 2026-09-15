@@ -30,3 +30,24 @@ net_architecture:
         in: 256
         out: 256
         activation: "RELU"
+
+  # enc:
+  #   type: "CNN"
+  #   layers:
+  #     - type: "CONV"
+  #       in: "IN"
+  #       out: 16
+  #       kernel: 8
+  #       stride: 4
+  #       activation: "RELU"
+  #     - type: "CONV"
+  #       in: 16
+  #       out: 32
+  #       kernel: 4
+  #       stride: 2
+  #       activation: "RELU"
+  #     - type: "FLATTEN"
+  #     - type: "LINEAR"
+  #       in: 2592
+  #       out: 256
+  #       activation: "RELU"
