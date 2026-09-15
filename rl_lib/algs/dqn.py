@@ -42,6 +42,12 @@ class DQN:
         self.optim = torch.optim.Adam(self.network.parameters(), lr=self.lr)
         self.buffer = OffPolicyBuffer(self.replay_size, env.num_envs, env.state_space.shape, env.action_space.shape)
 
+        if self.load_path is not None:
+            checkpoint = torch.load(self.load_path, map_location=device)
+            self.network.load_state_dict(checkpoint["net"])
+            self.target_network.load_state_dict(checkpoint["target_net"])
+            self.optim.load_state_dict(checkpoint["optim"])
+
     def _update_target_net(self):
         self.target_network.load_state_dict(self.network.state_dict())
 
@@ -65,6 +71,13 @@ class DQN:
             if self.cgn is not None:
                 torch.nn.utils.clip_grad_norm_(self.network.parameters(), self.cgn)
             self.optim.step()
+
+            self.stats = {
+                "network": {"net": self.network.state_dict(), "target_net": self.target_network.state_dict(), "optim": self.optim.state_dict()},
+                "metrics": {
+                    "qnet_loss": loss.item(),
+                }
+            }
 
     def act(self, state) -> Step:
         with torch.no_grad():

@@ -2,7 +2,7 @@
 defaults:
   - experiment_conf
   - env: gym
-  - alg: dqn
+  - alg: a2c
   - override hydra/job_logging: disabled
   - _self_
 

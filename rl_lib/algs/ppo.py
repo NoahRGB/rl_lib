@@ -93,7 +93,6 @@ class PPO:
                 self.optim.step()
 
                 self.stats = {
-                    "network": {"net": self.network.state_dict(), "optim": self.optim.state_dict()},
                     "metrics": {
                         "policy_loss": policy_loss.item(),
                         "value_loss": state_value_loss.item(),
@@ -102,6 +101,8 @@ class PPO:
                         "mean_return": flat_returns[minibatch_indices].mean().item()
                     }
                 }
+                
+        self.stats["network"] = {"net": self.network.state_dict(), "optim": self.optim.state_dict()}
 
     def act(self, state) -> Step:
         with torch.no_grad():
