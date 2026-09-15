@@ -3,7 +3,22 @@ import torch
 from rl_lib.envs.env import EnvDetails
 from rl_lib.utils.heads import detect_head
 from rl_lib.utils.encoders import detect_encoder
+from rl_lib.utils.spaces import Discrete
 
+class QNetwork(torch.nn.Module):
+
+    def __init__(self, env: EnvDetails, architecture: dict):
+        super(QNetwork, self).__init__()
+        assert type(env.action_space) == Discrete
+
+        self.encoder = detect_encoder(architecture["enc"], input_shape=env.state_space.shape)
+        self.enc_out = self.encoder.encoder_output
+
+        self.qvals_out = torch.nn.Linear(self.enc_out, env.action_space.n)
+
+    def forward(self, inp):
+        enc_out = self.encoder(inp)
+        return self.qvals_out(enc_out)
 
 class ActorCriticNetwork(torch.nn.Module):
 

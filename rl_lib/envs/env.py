@@ -1,5 +1,6 @@
 from typing import Protocol
 from dataclasses import dataclass
+import numpy as np
 
 from rl_lib.utils.spaces import Discrete, Continuous
 
@@ -12,8 +13,8 @@ class EnvDetails:
 class Environment(Protocol):
     details: EnvDetails
     seed: int|None
-    
-    def reset(self) -> any: ...
+
+    def reset(self, reset_mask: np.ndarray = None) -> any: ...
     def get_start_states(self) -> any: ...
     def step(self, action) -> tuple: ...
 

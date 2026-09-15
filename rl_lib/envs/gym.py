@@ -16,6 +16,7 @@ class GymEnv:
                  normalise_obs: bool = False, seed: int = None) -> None:
         
         self.seed = seed
+        self.has_reset = False # has the env been reset yet?
         self.is_atari = is_atari
         self.normalise_obs = normalise_obs
         self.env = self._make_env(env_id, num_envs)
@@ -25,7 +26,7 @@ class GymEnv:
         self.details = EnvDetails(num_envs=num_envs, 
                                   action_space=convert_gym_space(self.env.single_action_space), 
                                   state_space=convert_gym_space(self.env.single_observation_space))
-        self.start_states, _ = self.reset()
+        self.start_states = self.reset()
 
     def _make_env(self, env_name: str, num_envs: int, **env_kwargs):
 
@@ -55,8 +56,15 @@ class GymEnv:
             print(f"{env_name} not a valid Gymnasium environment")
             return None
 
-    def reset(self):
-        return self.env.reset(seed=self.seed)
+    def reset(self, reset_mask=None):
+        # only use self.seed for the first reset
+        seed = self.seed if not self.has_reset else None
+        self.has_reset = True
+
+        # only reset sub envs from reset_mask
+        options = {"reset_mask": reset_mask} if reset_mask is not None else None
+        obs, _ = self.env.reset(seed=seed, options=options)
+        return obs
 
     def get_start_states(self):
         return self.start_states

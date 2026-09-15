@@ -14,7 +14,8 @@ def seeding(seed: int):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
 
-def run_experiment(agent: Algorithm, env: Environment, logger: Logger, timesteps: int, seed: int, device: torch.device):
+def run_experiment(agent: Algorithm, env: Environment, logger: Logger, 
+                   timesteps: int, seed: int, device: torch.device):
     seeding(seed)
 
     agent.setup(env.details, device)
@@ -32,8 +33,21 @@ def run_experiment(agent: Algorithm, env: Environment, logger: Logger, timesteps
         dones = is_terms|is_truncs
 
         logger.timestep_complete(rewards, dones, agent.get_stats())
-        agent.timestep_complete(states, step, rewards, next_states, dones)
-        states = next_states
+        agent.timestep_complete(timesteps_completed, states, step, rewards, next_states, is_terms)
+
+        # gymnasium SyncVectorEnv reset modes
+        # see https://farama.org/Vector-Autoreset-Mode
+        
+        # NEXT-STEP MODE:
+        # env terminates at time t
+        # so at time t+1 it resets()
+        # so env is not ready for actions again until time t+2
+
+        # THE FIX:
+        # env terminates at time t
+        # manually call a reset() at time t
+        # so env is ready for actions again at time t+1
+        states = env.reset(dones) if dones.any() else next_states
 
         timesteps_completed += num_envs
     

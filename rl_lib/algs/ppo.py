@@ -33,7 +33,7 @@ class PPO:
 
         self.network = ActorCriticNetwork(env, self.net_architecture).to(device)
         self.optim = torch.optim.Adam(self.network.parameters(), lr=self.lr)
-        self.buffer = OnPolicyBuffer(self.tmax, self.env.num_envs, self.env.state_space.shape, self.env.action_space.shape)
+        self.buffer = OnPolicyBuffer(self.tmax, env.num_envs, env.state_space.shape, env.action_space.shape)
         self.is_continuous = self.network.get_head_type() is not CategoricalHead
 
         if self.load_path is not None:
@@ -120,7 +120,7 @@ class PPO:
 
             return Step(action=action.cpu().numpy(), log_prob=log_prob.cpu().numpy())
 
-    def timestep_complete(self, state, step: Step, reward, next_state, done) -> None:
+    def timestep_complete(self, timestep: int, state, step: Step, reward, next_state, done) -> None:
         self.buffer.add(state, step.action, reward, next_state, done, step.log_prob)
         if self.buffer.is_full():
             self.learn()

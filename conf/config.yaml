@@ -2,13 +2,15 @@
 defaults:
   - experiment_conf
   - env: gym
-  - alg: ppo
+  - alg: dqn
   - override hydra/job_logging: disabled
   - _self_
+
+
 timesteps: 100000
 device: cpu
 seed: 1
-title: ppo_cartpole
+title: testing
 
 logger:
   _target_: rl_lib.experiment.logger.Logger
