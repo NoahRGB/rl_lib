@@ -10,16 +10,21 @@ def convert_gym_space(space):
     elif isinstance(space, gym.spaces.Box):
         return Continuous(mins=space.low, maxs=space.high, shape=space.shape)
 
+gym.register(
+    id="ThrustEnv",
+    entry_point="src.thrust_gym.thrust_gymenv:ThrustEnv",
+)
+
 class GymEnv:
     
     def __init__(self, env_id: str, num_envs: int, is_atari: bool = False, 
-                 normalise_obs: bool = False, seed: int = None) -> None:
+                 normalise_obs: bool = False, seed: int = None, **env_kwargs) -> None:
         
         self.seed = seed
         self.has_reset = False # has the env been reset yet?
         self.is_atari = is_atari
         self.normalise_obs = normalise_obs
-        self.env = self._make_env(env_id, num_envs)
+        self.env = self._make_env(env_id, num_envs, **env_kwargs)
         if self.env is None:
             raise ValueError(f"Environment {env_id} could not be created")
 

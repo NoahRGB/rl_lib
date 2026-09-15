@@ -1,0 +1,43 @@
+
+_target_: "rl_lib.algs.icm_ppo.ICM_PPO"
+lr: 0.001
+tmax: 32
+gamma: 0.99
+lam: 0.8
+epochs: 20
+minibatch_size: 256
+epsilon: 0.2
+entropy_weight: 0.0
+cgn: 0.5
+value_weight: 0.5
+load_path: #"results/logs/"
+
+eta: 0.01
+beta: 0.2
+icm_lam: 0.1
+
+net_architecture:
+
+  icm_enc:
+    type: "MLP"
+    layers:
+      - type: "LINEAR"
+        in: "IN"
+        out: 64
+        activation: "RELU"
+      - type: "LINEAR"
+        in: 64
+        out: 64
+        activation: "RELU"
+
+  shared_ppo_enc:
+    type: "MLP"
+    layers:
+      - type: "LINEAR"
+        in: "IN"
+        out: 64
+        activation: "TANH"
+      - type: "LINEAR"
+        in: 64
+        out: 64
+        activation: "TANH"

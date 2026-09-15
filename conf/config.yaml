@@ -2,7 +2,7 @@
 defaults:
   - experiment_conf
   - env: gym
-  - alg: sac
+  - alg: icm_ppo
   - override hydra/job_logging: disabled
   - _self_
 
@@ -10,7 +10,7 @@ defaults:
 timesteps: 100000
 device: cpu
 seed: 1
-title: testing
+title: icm_testing
 
 logger:
   _target_: rl_lib.experiment.logger.Logger

@@ -1,19 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 import hydra
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, MISSING
 import torch
 
 from rl_lib.experiment.runner import run_experiment
-
-@dataclass
-class EnvConf:
-    _target_: str = MISSING
-    env_id: str = MISSING
-    num_envs: int = MISSING
-    is_atari: Optional[bool] = False
-    normalise_obs: Optional[bool] = False
 
 @dataclass
 class LoggerConf:
@@ -27,8 +19,8 @@ class LoggerConf:
 
 @dataclass
 class ExperimentConf:
-    env: EnvConf = field(default_factory=EnvConf)
     logger: LoggerConf = field(default_factory=LoggerConf)
+    env: Any = MISSING
     alg: Any = MISSING
     title: str = MISSING
     timesteps: int = MISSING

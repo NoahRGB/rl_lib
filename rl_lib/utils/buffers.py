@@ -3,7 +3,8 @@ import torch
 
 class Batch:
     def __init__(self, states: torch.tensor, actions: torch.tensor, rewards: torch.tensor, 
-                 next_states: torch.tensor, dones: torch.tensor, log_probs: torch.tensor = None):
+                 next_states: torch.tensor, dones: torch.tensor, log_probs: torch.tensor = None,
+                 intrinsic_rewards: torch.tensor = None):
 
         # tensors should all be of shape (tmax, batch, *dim)
         # batch could be the num_envs, the minibatch_size, etc.
@@ -14,6 +15,7 @@ class Batch:
         self.next_states = next_states
         self.dones = dones
         self.log_probs = log_probs
+        self.intrinsic_rewards = intrinsic_rewards
         self.masks = 1 - self.dones
 
     def gae(self, state_values: torch.tensor, final_state_values: torch.tensor, gamma: float, lam: float, device: torch.device):
@@ -51,7 +53,8 @@ class Batch:
                      self.rewards[indices], 
                      self.next_states[indices], 
                      self.dones[indices], 
-                     self.log_probs[indices] if self.log_probs is not None else None)
+                     self.log_probs[indices] if self.log_probs is not None else None,
+                     self.intrinsic_rewards[indices] if self.intrinsic_rewards is not None else None)
 
     def flatten(self):
         if len(self.states.shape) > 2:
@@ -63,6 +66,7 @@ class Batch:
                 self.next_states.reshape(tmax*batch, *self.next_states.shape[2:]), 
                 self.dones.reshape(tmax*batch), 
                 self.log_probs.reshape(tmax*batch) if self.log_probs is not None else None,
+                self.intrinsic_rewards.reshape(tmax*batch) if self.intrinsic_rewards is not None else None
             )
         else:
             return None
@@ -120,18 +124,28 @@ class OnPolicyBuffer:
         self.rewards_buffer = np.empty((self.max_size, self.num_envs), dtype=np.float32)
         self.next_states_buffer = np.empty((self.max_size, self.num_envs, *state_dim), dtype=np.float32)
         self.dones_buffer = np.empty((self.max_size, self.num_envs), dtype=np.float32)
+
         self.log_probs_buffer = np.empty((self.max_size, self.num_envs), dtype=np.float32)
+        self.intrinsic_rewards = np.empty((self.max_size, self.num_envs), dtype=np.float32)
 
     def is_full(self):
         return self.current_size >= self.max_size
 
-    def add(self, states: np.array, actions: np.array, rewards: np.array, next_states: np.array, dones: np.array, log_probs: np.array=None):
+    def add(self, states: np.array, actions: np.array, rewards: np.array, 
+            next_states: np.array, dones: np.array, log_probs: np.array=None,
+            intrinsic_rewards: np.array=None):
+        
         self.states_buffer[self.pointer] = states
         self.actions_buffer[self.pointer] = actions
         self.rewards_buffer[self.pointer] = rewards
         self.next_states_buffer[self.pointer] = next_states
         self.dones_buffer[self.pointer] = dones
-        self.log_probs_buffer[self.pointer] = log_probs
+
+        if log_probs is not None:
+            self.log_probs_buffer[self.pointer] = log_probs
+        if intrinsic_rewards is not None:
+            self.intrinsic_rewards[self.pointer] = intrinsic_rewards
+
         self.pointer += 1
         self.current_size += 1
 
@@ -141,7 +155,8 @@ class OnPolicyBuffer:
                      torch.from_numpy(self.rewards_buffer).to(device), 
                      torch.from_numpy(self.next_states_buffer).to(device), 
                      torch.from_numpy(self.dones_buffer).to(device), 
-                     torch.from_numpy(self.log_probs_buffer).to(device))
+                     torch.from_numpy(self.log_probs_buffer).to(device),
+                     torch.from_numpy(self.intrinsic_rewards).to(device))
 
     def clear(self):
         self.current_size = 0
