@@ -1,22 +1,64 @@
 
 _target_: "rl_lib.algs.icm_ppo.ICM_PPO"
-lr: 0.001
-tmax: 32
+lr: 0.0003
+tmax: 256
 gamma: 0.99
-lam: 0.8
-epochs: 20
+lam: 0.95
+epochs: 10
 minibatch_size: 256
-epsilon: 0.2
-entropy_weight: 0.0
+epsilon: 0.1
+entropy_weight: 0.04
 cgn: 0.5
-value_weight: 0.5
-load_path: #"results/logs/"
+value_weight: 0.8
+load_path: # "results/temps/torch_checkpoint.pt" # "results/logs/2026-09-15/icm_testing_220838/torch_checkpoint.pt"
 
-eta: 0.01
+eta: 0.1
 beta: 0.2
 icm_lam: 0.1
 
 net_architecture:
+
+  # icm_enc:
+  #   type: "CNN"
+  #   layers:
+  #     - type: "CONV"
+  #       in: "IN"
+  #       out: 16
+  #       kernel: 8
+  #       stride: 4
+  #       activation: "RELU"
+  #     - type: "CONV"
+  #       in: 16
+  #       out: 32
+  #       kernel: 4
+  #       stride: 2
+  #       activation: "RELU"
+  #     - type: "FLATTEN"
+  #     - type: "LINEAR"
+  #       in: 2592
+  #       out: 256
+  #       activation: "RELU"
+
+  # shared_ppo_enc:
+  #   type: "CNN"
+  #   layers:
+  #     - type: "CONV"
+  #       in: "IN"
+  #       out: 16
+  #       kernel: 8
+  #       stride: 4
+  #       activation: "RELU"
+  #     - type: "CONV"
+  #       in: 16
+  #       out: 32
+  #       kernel: 4
+  #       stride: 2
+  #       activation: "RELU"
+  #     - type: "FLATTEN"
+  #     - type: "LINEAR"
+  #       in: 2592
+  #       out: 256
+  #       activation: "RELU"
 
   icm_enc:
     type: "MLP"

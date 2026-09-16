@@ -1,8 +1,8 @@
 
 _target_: rl_lib.envs.gym.GymEnv
-env_id: "CartPole-v1" # "PongNoFrameskip-v4"
+env_id: "ThrustEnv" # "PongNoFrameskip-v4"
 num_envs: 8
 is_atari: False
 normalise_obs: False
-render_mode:
-#obs_type: "game_state"
+render_mode: "human"
+obs_type: "game_state"

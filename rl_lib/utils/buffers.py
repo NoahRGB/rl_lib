@@ -18,16 +18,20 @@ class Batch:
         self.intrinsic_rewards = intrinsic_rewards
         self.masks = 1 - self.dones
 
-    def gae(self, state_values: torch.tensor, final_state_values: torch.tensor, gamma: float, lam: float, device: torch.device):
+    def gae(self, state_values: torch.tensor, final_state_values: torch.tensor, gamma: float, lam: float, device: torch.device, intrinsic: bool = False):
         if len(self.states.shape) > 2:
             # cannot compute GAE on flattened batch, needs (tmax, num_envs) shape
             
+            rewards_to_use = self.rewards
+            if intrinsic:
+                rewards_to_use = self.rewards + self.intrinsic_rewards
+
             gae = 0.0
             tmax = self.rewards.shape[0]
             advantages = torch.zeros_like(self.rewards).to(device)
             next_value = final_state_values
             for t in reversed(range(tmax)):
-                delta = self.rewards[t] + gamma * next_value * self.masks[t] - state_values[t]
+                delta = rewards_to_use[t] + gamma * next_value * self.masks[t] - state_values[t]
                 gae = delta + gamma * lam * self.masks[t] * gae
                 advantages[t] = gae
                 next_value = state_values[t]

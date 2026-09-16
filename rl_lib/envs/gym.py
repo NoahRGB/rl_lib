@@ -45,6 +45,9 @@ class GymEnv:
                     screen_size=84, grayscale_obs=True, grayscale_newaxis=False
                 )
                 env = gym.wrappers.FrameStackObservation(env, stack_size=4)
+                # env = gym.wrappers.GrayscaleObservation(env, keep_dim=False)
+                # env = gym.wrappers.ResizeObservation(env, (84, 84))
+                # env = gym.wrappers.FrameStackObservation(env, stack_size=4)
 
             if self.normalise_obs:
                 env = gym.wrappers.NormalizeObservation(env)

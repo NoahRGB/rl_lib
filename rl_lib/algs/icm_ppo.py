@@ -54,7 +54,7 @@ class ICM_PPO:
             state_values = state_values.view(self.tmax, self.env.num_envs)
             final_state_values = final_state_values.view(self.env.num_envs) # (num_envs,)
 
-            advantages, returns = full_batch.gae(state_values, final_state_values, self.gamma, self.lam, self.device)
+            advantages, returns = full_batch.gae(state_values, final_state_values, self.gamma, self.lam, self.device, intrinsic=True)
             flat_batch = full_batch.flatten()
             flat_advantages = advantages.view(self.tmax*self.env.num_envs)
             flat_returns = returns.view(self.tmax*self.env.num_envs)
